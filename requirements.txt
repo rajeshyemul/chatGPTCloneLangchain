@@ -1,0 +1,9 @@
+langchain
+PyPDF2
+python-dotenv
+streamlit
+faiss-cpu
+openAI
+tiktoken
+urllib3==1.26.6
+watchdog
