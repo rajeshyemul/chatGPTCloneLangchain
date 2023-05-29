@@ -1,11 +1,9 @@
 
 # Using python-dotenv to Load Env variables
 
-import docx2txt
-import PyPDF2
-
 import streamlit as st
 from dotenv import load_dotenv
+from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
@@ -15,38 +13,18 @@ from langchain.llms import OpenAI
 def main():
     load_dotenv()
 
-    st.set_page_config(page_title="Ask anything about your Document")
-    st.markdown("<h1 style='color: green;'>DocInsight Plus</h1>", unsafe_allow_html=True)
-    #st.header("DocInsight Plus")
-    st.markdown("<h2 style='color: blue;'>Discover, analyze, and interact with your documents</h2>", unsafe_allow_html=True)
-    #st.subheader("Discover, analyze, and interact with your documents")
-    
+    st.set_page_config(page_title="Ask your PDF")
+    st.header("Ask your PDF 💬")
 
     # upload file
-    file = st.file_uploader("Upload your document here [PDF,DOC,DOCX]", type=["pdf", "doc", "docx"])
+    pdf = st.file_uploader("Upload your document here", type= "pdf")
 
     # extract the text from the file
-    if file is not None:
-
-        file_ext = file.name.split(".")[-1]
+    if pdf is not None:
+        pdf_reader = PdfReader(pdf)
         text = ""
-        if file_ext == "pdf":
-            pdf_reader = PyPDF2.PdfReader(file)
-
-            for page in pdf_reader.pages:
-                text += page.extract_text()
-                
-        elif file_ext == "docx":
-            text = docx2txt.process(file)
-        
-        elif file_ext == "doc":
-            # Convert .doc to .docx before extracting text
-            docx_file = st._maybe_convert_to_docx(file)
-
-            if docx_file:
-                text = docx2txt.process(docx_file)
-            else:
-                st.error("Failed to convert .doc file to .docx")
+        for page in pdf_reader.pages:
+            text += page.extract_text()
 
         # split text into chunks
         text_chunks = CharacterTextSplitter (
