@@ -1,8 +1,10 @@
 
 # Using python-dotenv to Load Env variables
 
+import codecs
 import docx2txt
 import PyPDF2
+import pandas as pd
 
 import streamlit as st
 from dotenv import load_dotenv
@@ -23,7 +25,7 @@ def main():
     
 
     # upload file
-    file = st.file_uploader("Upload your document here [PDF,DOC,DOCX]", type=["pdf", "doc", "docx"])
+    file = st.file_uploader("Upload your document here [PDF,DOC,DOCX, CSV, TXT]", type=["pdf", "doc", "docx", "TXT", "CSV"])
 
     # extract the text from the file
     if file is not None:
@@ -47,6 +49,13 @@ def main():
                 text = docx2txt.process(docx_file)
             else:
                 st.error("Failed to convert .doc file to .docx")
+        
+        elif file_ext == "csv":
+            df = pd.read_csv(file)
+            text = df.to_string(index=False)
+        
+        elif file_ext == "txt":
+            text = codecs.decode(file.read(), encoding='utf-8')
 
         # split text into chunks
         text_chunks = CharacterTextSplitter (
